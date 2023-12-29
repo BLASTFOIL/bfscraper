@@ -1,0 +1,61 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Package Build",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Upgrade Build"
+            ]
+        },
+        {
+            "label": "Package Test",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m pytest",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Install Testing Dependencies"
+            ]
+        },
+        {
+            "label": "Install Testing Dependencies",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m pip install . .[test]",
+            "hide": true
+        },
+        {
+            "label": "Upgrade Build",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m pip install --upgrade build",
+            "hide": true
+        },
+        {
+            "label": "Install Package",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m pip install .",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Install Package (editable)",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m pip install -e .",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        }
+    ]
+}
