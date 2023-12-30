@@ -6,8 +6,6 @@ import requests
 from colorama import Style
 from tqdm.asyncio import tqdm_asyncio
 
-from ..config import BASE_URL
-
 
 class AsyncScraper:
 
@@ -57,26 +55,6 @@ class AsyncScraper:
         Args:
             url (str): URL to scrape.
         """
-        try:
-            async with self.session.get(url=url) as response:
-                data = await response.read()
-
-        except Exception as exc:
-            print(f"ERROR: Unable to get URL {url} due to {exc.__class__}.")
-            print(f"{' ' * 4} > {exc}")
-            self.failed.append(url)
-            print(f"{' ' * 4} > {len(self.failed)} failed URLs so far.")
-
-
-class AirfoilData(AsyncScraper):
-
-    async def process(self, url: str) -> None:
-        """Single asynchronous process.
-
-        Args:
-            url (str): URL to scrape.
-        """
-        url = f"{BASE_URL}/{url}"
         try:
             async with self.session.get(url=url) as response:
                 data = await response.read()
