@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bfscraper"
-version = "0.0.0"
+version = "0.1.0"
 description = "BLASTFOIL scraper for database population"
 readme = "README.md"
 license = { file = "LICENSE" }
