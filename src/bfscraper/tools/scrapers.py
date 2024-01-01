@@ -15,6 +15,7 @@ class AsyncScraper:
 
     Attributes:
         cache (Cache): cache instance.
+        failed (dict[str, list[str]]): failed URLs.
         progress_bar (bool): whether to display a progress bar.
         TIMEOUT (int): timeout for each request.
         LIMIT (int): maximum number of concurrent requests.
@@ -32,9 +33,9 @@ class AsyncScraper:
                 to True.
         """
         self.cache = cache
-        self.failed: dict[str, list[str]] = {}
         self.progress_bar = progress_bar
-        self.session = aiohttp.ClientSession(
+        self._failed: dict[str, list[str]] = {}
+        self._session = aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(total=self.TIMEOUT),
             connector=aiohttp.TCPConnector(limit=self.LIMIT)
         )
@@ -60,6 +61,45 @@ class AsyncScraper:
 
         self._progress_bar = value
 
+    @property
+    def cache(self) -> Cache:
+        """Get cache instance.
+
+        Returns:
+            Cache: cache instance.
+        """
+        return self._cache
+
+    @cache.setter
+    def cache(self, value: Cache) -> None:
+        """Set cache instance.
+
+        Args:
+            value (Cache): cache instance.
+        """
+        if not isinstance(value, Cache):
+            raise TypeError("cache must be a Cache instance.")
+
+        self._cache = value
+
+    @property
+    def failed(self) -> dict[str, list[str]]:
+        """Get failed URLs.
+
+        Returns:
+            dict[str, list[str]]: failed URLs.
+        """
+        return self._failed
+
+    @property
+    def session(self) -> aiohttp.ClientSession:
+        """Get aiohttp session.
+
+        Returns:
+            aiohttp.ClientSession: aiohttp session.
+        """
+        return self._session
+
     async def _process(self, entry: Any, collection: Any) -> None:
         """Individual asynchronous process.
 
@@ -75,35 +115,37 @@ class AsyncScraper:
         Args:
             collection (Any): collection to be processed.
         """
-        async with self.session as session:
-            if self._progress_bar:
-                await tqdm_asyncio.gather(
-                    *[self._process(item, collection) for item in collection],
-                    desc="Scraping URLs",
-                    bar_format=(
-                        "{desc} {n_fmt} of {total_fmt}: {bar} ETA: "
-                        + "{remaining}"
-                    )
+        async with self._session as session:
+            await tqdm_asyncio.gather(
+                *[self._process(item, collection) for item in collection],
+                disable=not self._progress_bar,
+                smoothing=0.01,
+                colour="YELLOW",
+                bar_format=(
+                    Style.BRIGHT + Fore.YELLOW
+                    + "> {percentage:3.0f}% |"
+                    + Style.RESET_ALL
+                    + "{bar}"
+                    + Style.BRIGHT + Fore.YELLOW
+                    + "| <"
                 )
-            else:
-                await asyncio.gather(
-                    *[self._process(item, collection) for item in collection],
-                )
+            )
 
-            if self.failed:
+            if self._failed:
                 print(
                     f"{Style.BRIGHT}{Fore.RED}ERROR: "
-                    + f"{sum(len(value) for value in self.failed.values())} "
+                    + f"{sum(len(value) for value in self._failed.values())} "
                     + f"URLs could not be scraped:{Style.RESET_ALL}"
                 )
 
-                for exception, urls in self.failed.items():
-                    print(
-                        f"{Fore.YELLOW}{' ' * 2}> {exception}:"
-                        + Style.RESET_ALL
+                print("\n".join(
+                    f"{Fore.RED}{Style.BRIGHT}{' ' * 2}> {exception}:\n"
+                    + Style.RESET_ALL + "\n".join(
+                        f"{Fore.YELLOW}{' ' * 4}> {url}{Style.RESET_ALL}"
+                        for url in urls
                     )
-                    for url in urls:
-                        print(f"{' ' * 4}> {url}")
+                    for exception, urls in self._failed.items()
+                ) + "\n")
 
     def scrape(self, collection: Any) -> None:
         """Scrape URLs asynchronously.
