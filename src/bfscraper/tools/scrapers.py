@@ -3,6 +3,7 @@ from typing import Any
 
 import aiohttp
 import regex as re
+from colorama import Fore, Style
 from tqdm.asyncio import tqdm_asyncio
 
 from ..core.cache import Cache
@@ -31,6 +32,7 @@ class AsyncScraper:
                 to True.
         """
         self.cache = cache
+        self.failed: dict[str, list[str]] = {}
         self.progress_bar = progress_bar
         self.session = aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(total=self.TIMEOUT),
@@ -88,6 +90,21 @@ class AsyncScraper:
                     *[self._process(item, collection) for item in collection],
                 )
 
+            if self.failed:
+                print(
+                    f"{Style.BRIGHT}{Fore.RED}ERROR: "
+                    + f"{sum(len(value) for value in self.failed.values())} "
+                    + f"URLs could not be scraped:{Style.RESET_ALL}"
+                )
+
+                for exception, urls in self.failed.items():
+                    print(
+                        f"{Fore.YELLOW}{' ' * 2}> {exception}:"
+                        + Style.RESET_ALL
+                    )
+                    for url in urls:
+                        print(f"{' ' * 4}> {url}")
+
     def scrape(self, collection: Any) -> None:
         """Scrape URLs asynchronously.
 
@@ -139,8 +156,7 @@ class DownloadLinksExtractor(AsyncScraper):
                 self.cache.set(entry, collection[entry])
 
         except Exception as exc:
-            print(f"ERROR: Unable to get URL {url} due to {exc.__class__}.")
-            print(f"{' ' * 4}> {exc}")
+            self.failed.setdefault(exc.__class__.__name__, []).append(url)
 
 
 class DownloadDataExtractor(AsyncScraper):
@@ -168,6 +184,4 @@ class DownloadDataExtractor(AsyncScraper):
                     self.cache.set(entry, collection[entry])
 
             except Exception as exc:
-                print(
-                    f"ERROR: Unable to get URL {url} due to {exc.__class__}.")
-                print(f"{' ' * 4}> {exc}")
+                self.failed.setdefault(exc.__class__.__name__, []).append(url)
