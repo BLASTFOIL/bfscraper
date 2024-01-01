@@ -1,9 +1,8 @@
 import asyncio
-from typing import Any, Iterable
+from typing import Any
 
 import aiohttp
 import regex as re
-import requests
 from tqdm.asyncio import tqdm_asyncio
 
 from ..core.cache import Cache
@@ -59,25 +58,25 @@ class AsyncScraper:
 
         self._progress_bar = value
 
-    async def _process(self, entry: Any, iterable: Iterable) -> None:
+    async def _process(self, entry: Any, collection: Any) -> None:
         """Individual asynchronous process.
 
         Args:
             entry (Any): data entry.
-            iterable (Iterable): iterable to be processed.
+            collection (Any): collection to be processed.
         """
         pass
 
-    async def _gather(self, iterable: Iterable) -> None:
+    async def _gather(self, collection: Any) -> None:
         """Asyncio gather wrapper.
 
         Args:
-            iterable (Iterable): iterable to be processed.
+            collection (Any): collection to be processed.
         """
         async with self.session as session:
             if self._progress_bar:
                 await tqdm_asyncio.gather(
-                    *[self._process(item, iterable) for item in iterable],
+                    *[self._process(item, collection) for item in collection],
                     desc="Scraping URLs",
                     bar_format=(
                         "{desc} {n_fmt} of {total_fmt}: {bar} ETA: "
@@ -86,35 +85,35 @@ class AsyncScraper:
                 )
             else:
                 await asyncio.gather(
-                    *[self._process(item, iterable) for item in iterable],
+                    *[self._process(item, collection) for item in collection],
                 )
 
-    def scrape(self, iterable: Iterable) -> None:
+    def scrape(self, collection: Any) -> None:
         """Scrape URLs asynchronously.
 
         This method contains the asyncio event loop that runs the asynchronous
         processes.
 
         Args:
-            iterable (Iterable): iterable to be processed.
+            collection (Any): collection to be processed.
         """
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(self._gather(iterable=iterable))
+        loop.run_until_complete(self._gather(collection=collection))
 
 
 class DownloadLinksExtractor(AsyncScraper):
 
-    async def _process(self, entry: Any, iterable: Iterable) -> None:
+    async def _process(self, entry: Any, collection: Any) -> None:
         """Individual asynchronous process.
 
         Args:
             entry (Any): data entry.
-            iterable (Iterable): iterable to be processed.
+            collection (Any): collection to be processed.
         """
-        url = iterable[entry]["links"]["files"]
+        url = collection[entry]["links"]["files"]
 
         if self.cache.get(entry, {}).get("download-links"):
-            iterable[entry]["download-links"] = self.cache.get(
+            collection[entry]["download-links"] = self.cache.get(
                 entry
             )["download-links"]
             return
@@ -127,7 +126,7 @@ class DownloadLinksExtractor(AsyncScraper):
                     flags=REGEX_FLAGS
                 ).pop()
 
-                iterable[entry]["download-links"].update({
+                collection[entry]["download-links"].update({
                     match.group(1).lower().replace(" ", "-").strip(":"):
                         f"{BASE_URL}{match.group(2)}"
                     for match in re.finditer(
@@ -137,7 +136,7 @@ class DownloadLinksExtractor(AsyncScraper):
                     )
                 })
 
-                self.cache.set(entry, iterable[entry])
+                self.cache.set(entry, collection[entry])
 
         except Exception as exc:
             print(f"ERROR: Unable to get URL {url} due to {exc.__class__}.")
@@ -146,27 +145,27 @@ class DownloadLinksExtractor(AsyncScraper):
 
 class DownloadDataExtractor(AsyncScraper):
 
-    async def _process(self, entry: Any, iterable: Iterable) -> None:
+    async def _process(self, entry: Any, collection: Any) -> None:
         """Individual asynchronous process.
 
         Args:
             entry (Any): data entry.
-            iterable (Iterable): iterable to be processed.
+            collection (Any): collection to be processed.
         """
-        for name, url in iterable[entry]["download-links"].items():
+        for name, url in collection[entry]["download-links"].items():
             if self.cache.get(entry, {}).get("download-data", {}).get(name):
-                iterable[entry]["download-data"][name] = self.cache.get(
+                collection[entry]["download-data"][name] = self.cache.get(
                     entry
                 )["download-data"][name]
                 continue
 
             try:
                 async with self.session.get(url=url) as response:
-                    iterable[entry]["download-data"][name] = (
+                    collection[entry]["download-data"][name] = (
                         await response.read()
                     ).decode("utf-8")
 
-                    self.cache.set(entry, iterable[entry])
+                    self.cache.set(entry, collection[entry])
 
             except Exception as exc:
                 print(

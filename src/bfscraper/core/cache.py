@@ -18,7 +18,7 @@ class Cache:
             filename (str): cache file path.
         """
         self.filename = filename
-        self.cache = {}
+        self.cache: dict[str, Any] = {}
         self.load()
 
     def load(self) -> None:

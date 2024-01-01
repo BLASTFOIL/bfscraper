@@ -1,21 +1,17 @@
 import asyncio
 import json
-import os
-import sys
 from time import perf_counter as pc
 
 import regex as re
 import requests
 from colorama import Fore, Style
-from requests_html import HTMLSession
 
 from .core.cache import Cache
-from .scrapers import BigFoilScraper
 from .tools.config import BASE_URL, REGEX_FLAGS, TABLE_URL, get_file_url
 from .tools.scrapers import DownloadDataExtractor, DownloadLinksExtractor
 
 
-def parseFloat(string: str) -> float:
+def parseFloat(string: str) -> float | None:
     try:
         return float(string)
     except Exception:
