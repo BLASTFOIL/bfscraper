@@ -3,9 +3,9 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "scraper_plugin_template"
+name = "bfscraper"
 version = "0.0.0"
-description = "Template repository for BSFSim scraper plugins"
+description = "BLASTFOIL scraper for database population"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.11.6"

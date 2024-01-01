@@ -1,14 +1,36 @@
-# Scraper Plugin Template
+# BASTFOIL Scraper
 
-This repository serves as template for `BSFSim` scraper plugin development. It contains the basic structure of a plugin and a base code source that will make it easier to start developing a new plugin.
-
-## How to use
-
-```bash
-git clone https://github.com/BLASTFOIL/scraper-plugin-template.git
-cd scraper-plugin-template
-python -m src.initializer  # Initialize the plugin repository
-```
+This is a compound scraper module for BLASTFOIL database population. It gathers airfoil data from different sources and stores it in a single database.
 
 > [!NOTE]
-> The instructions above assume that your Python executable is named `python` and that it is in your `PATH` environment variable. If that is not the case, you will have to replace `python` with the name of your Python executable.
+> All instructions in this README assume your Python 3.11.6+ installation is in your PATH and is aliased under `python`. If this is not the case, you will need to replace `python` with the alias or path that points to the correct Python executable.
+
+## Installation
+
+```bash
+git clone https://github.com/BLASTFOIL/bfscraper.git
+cd bfscraper
+# Consider using a virtual environment prior to installing.
+python -m pip install .
+```
+
+## Usage
+
+Calling the module will automatically scrape all sources and store the data in a single database.
+
+```bash
+python -m bfscraper
+```
+
+## Sources
+
+This is the list of domains that are currently supported for scraping:
+
+- [BigFoil](https://bigfoil.ae.illinois.edu)
+- [AirfoilTools](https://airfoiltools.com) (included in the BigFoil source)
+
+## Disclaimer
+
+All information presented herein is delivered without guarantee or warranty of any kind. The user assumes the entire risk of use of this information. In no event shall any person be liable for any direct, indirect, consequential or incidental damages arising from the use of, or reliance on, this information. This information is subject to change without notice.
+
+This tool is not, in any way, related to any of the sources mentioned above. It is an independent project that aims to gather data from different sources and store it in a single database for ease of access.
