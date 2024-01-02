@@ -1,10 +1,12 @@
 import asyncio
 import json
+import sys
 from time import perf_counter as pc
 
 import regex as re
 import requests
 from colorama import Fore, Style
+from hurry.filesize import size
 
 from .core.cache import Cache
 from .tools.config import BASE_URL, REGEX_FLAGS, TABLE_URL, get_file_url
@@ -79,7 +81,7 @@ data = {
 }
 fprint(f"INFO: Done! ({pc() - cron:.2f}s)", Fore.GREEN, Style.BRIGHT)
 
-data = {k: data[k] for k in list(data.keys())[:100]}  # REMOVEME
+data = {k: data[k] for k in list(data.keys())[:0]}  # REMOVEME
 
 #  Data extraction and caching:
 CACHE = Cache(".cache")
@@ -103,3 +105,17 @@ with open("bigfoil.json", "w") as f:
     json.dump(data, f, indent=4)
 
 fprint(f"INFO: Done! ({pc() - cron:.2f}s)", Fore.GREEN, Style.BRIGHT)
+
+# Summary:
+total_bytes_1 = sum(
+    sum(sys.getsizeof(value) for value in entry['download-data'].values())
+    for entry in data.values()
+)
+total_bytes_2 = sys.getsizeof(json.dumps(data, indent=4))
+
+print(
+    Fore.GREEN + Style.BRIGHT
+    + f"INFO: Scraped {len(data)} airfoils with a total size of"
+    + f" {size(total_bytes_1)} ({size(total_bytes_2)} including metadata)."
+    + Style.RESET_ALL
+)
