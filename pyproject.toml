@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bfscraper"
+version = "0.1.0"
+description = "BLASTFOIL scraper for database population"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11.6"
+authors = [{ name = "Paulo Sanchez", email = "dev.szblzpaulo@gmail.com" }]
+maintainers = [{ name = "Paulo Sanchez", email = "dev.szblzpaulo@gmail.com" }]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "aiohttp>=3.9.1",
+    "asyncio>=3.4.3",
+    "hurry.filesize>=0.9",
+    "regex>=2023.12.25",
+    "requests>=2.31.0",
+    "tqdm>=4.66.1",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest==7.4.3",
+    "pytest-cov==4.1.0",
+    "pytest-html==4.1.1",
+    "pycodestyle==2.11.1",
+    "pydocstyle==6.3.0",
+    "mypy==1.7.0",
+    "flake8==6.1.0",
+]
