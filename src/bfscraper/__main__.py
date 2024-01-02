@@ -35,6 +35,15 @@ def fprint(
     print(f"{color}{style}{message}{Style.RESET_ALL}")
 
 
+# Data fetching limiter:
+if len(sys.argv) > 1:
+    try:
+        limiter = int(sys.argv[1])
+    except Exception:
+        limiter = 0
+else:
+    limiter = 0
+
 fprint("INFO: Fetching database entries...", Fore.YELLOW, Style.BRIGHT)
 cron = pc()
 request = requests.get(TABLE_URL)
@@ -77,22 +86,20 @@ data = {
             "CdCl06": parseFloat(entry["CdCl06"])
         }
     }
-    for entry in request.json()
+    for entry in (request.json()[:limiter] if limiter > 0 else request.json())
 }
 fprint(f"INFO: Done! ({pc() - cron:.2f}s)", Fore.GREEN, Style.BRIGHT)
-
-data = {k: data[k] for k in list(data.keys())[:0]}  # REMOVEME
 
 #  Data extraction and caching:
 CACHE = Cache(".cache")
 
-fprint("INFO: Scraping URLs...", Fore.YELLOW, Style.BRIGHT)
+fprint(f"INFO: Scraping {len(data)} URLs...", Fore.YELLOW, Style.BRIGHT)
 cron = pc()
 DownloadLinksExtractor(cache=CACHE).scrape(data)
 CACHE.save()
 fprint(f"INFO: Done! ({pc() - cron:.2f}s)", Fore.GREEN, Style.BRIGHT)
 
-fprint("INFO: Scraping data...", Fore.YELLOW, Style.BRIGHT)
+fprint(f"INFO: Downloading {len(data)} airfoils...", Fore.YELLOW, Style.BRIGHT)
 cron = pc()
 DownloadDataExtractor(cache=CACHE).scrape(data)
 CACHE.save()
