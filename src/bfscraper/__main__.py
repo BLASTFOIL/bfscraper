@@ -9,40 +9,9 @@ from colorama import Fore, Style
 from hurry.filesize import size
 
 from .core.cache import Cache
+from .tools.aux import fprint, get_limit, parseFloat
 from .tools.config import BASE_URL, REGEX_FLAGS, TABLE_URL, get_file_url
 from .tools.scrapers import DownloadDataExtractor, DownloadLinksExtractor
-
-
-def parseFloat(string: str) -> float | None:
-    try:
-        return float(string)
-    except Exception:
-        return None
-
-
-def fprint(
-    message: str = "",
-    color: str = Fore.WHITE,
-    style: str = Style.NORMAL
-) -> None:
-    """Print formatted text.
-
-    Args:
-        message (str, optional): message to print. Defaults to "".
-        color (str, optional): text color. Defaults to Fore.WHITE.
-        style (str, optional): text style. Defaults to Style.NORMAL.
-    """
-    print(f"{color}{style}{message}{Style.RESET_ALL}")
-
-
-# Data fetching limiter:
-if len(sys.argv) > 1:
-    try:
-        limiter = int(sys.argv[1])
-    except Exception:
-        limiter = 0
-else:
-    limiter = 0
 
 fprint("INFO: Fetching database entries...", Fore.YELLOW, Style.BRIGHT)
 cron = pc()
@@ -51,6 +20,7 @@ fprint(f"INFO: Done! ({pc() - cron:.2f}s)", Fore.GREEN, Style.BRIGHT)
 
 fprint("INFO: Parsing database entries...", Fore.YELLOW, Style.BRIGHT)
 cron = pc()
+limit = get_limit()
 data = {
     (
         id_ := re.findall(
@@ -86,7 +56,7 @@ data = {
             "CdCl06": parseFloat(entry["CdCl06"])
         }
     }
-    for entry in (request.json()[:limiter] if limiter > 0 else request.json())
+    for entry in (request.json()[:limit] if limit > 0 else request.json())
 }
 fprint(f"INFO: Done! ({pc() - cron:.2f}s)", Fore.GREEN, Style.BRIGHT)
 
