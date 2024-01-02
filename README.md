@@ -19,8 +19,10 @@ python -m pip install .
 Calling the module will automatically scrape all sources and store the data in a single database.
 
 ```bash
-python -m bfscraper
+python -m bfscraper [<limit>]
 ```
+
+The `limit` argument is optional and will limit the number of airfoils scraped from each source. If not specified, all airfoils will be scraped.
 
 ## Sources
 
