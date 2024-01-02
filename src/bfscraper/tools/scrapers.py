@@ -135,13 +135,14 @@ class AsyncScraper:
                 print(
                     f"{Style.BRIGHT}{Fore.RED}ERROR: "
                     + f"{sum(len(value) for value in self._failed.values())} "
-                    + f"URLs could not be scraped:{Style.RESET_ALL}"
+                    + f"URLs could not be scraped due to {len(self._failed)} "
+                    + f"error types:{Style.RESET_ALL}"
                 )
 
                 print("\n".join(
-                    f"{Fore.RED}{Style.BRIGHT}{' ' * 2}> {exception}:\n"
+                    f"{Fore.RED}{Style.BRIGHT}> {exception}:\n"
                     + Style.RESET_ALL + "\n".join(
-                        f"{Fore.YELLOW}{' ' * 4}> {url}{Style.RESET_ALL}"
+                        f"{Fore.YELLOW}{' ' * 2}> {url}{Style.RESET_ALL}"
                         for url in urls
                     )
                     for exception, urls in self._failed.items()
