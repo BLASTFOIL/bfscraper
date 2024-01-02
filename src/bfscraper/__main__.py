@@ -1,4 +1,10 @@
-import asyncio
+"""Main execution module.
+
+Author:
+    Paulo Sanchez (@erlete)
+"""
+
+
 import json
 import sys
 from time import perf_counter as pc
@@ -9,8 +15,8 @@ from colorama import Fore, Style
 from hurry.filesize import size
 
 from .core.cache import Cache
-from .tools.aux import fprint, get_limit, parseFloat
-from .tools.config import BASE_URL, REGEX_FLAGS, TABLE_URL, get_file_url
+from .tools.aux import fprint, get_file_url, get_limit, parseFloat
+from .tools.config import REGEX_FLAGS, TABLE_URL
 from .tools.scrapers import DownloadDataExtractor, DownloadLinksExtractor
 
 fprint("INFO: Fetching database entries...", Fore.YELLOW, Style.BRIGHT)

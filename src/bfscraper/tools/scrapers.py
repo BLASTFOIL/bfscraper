@@ -1,3 +1,13 @@
+"""Scraping utilities module.
+
+This module contains all classes and methods that make asynchronous scraping
+possible.
+
+Author:
+    Paulo Sanchez (@erlete)
+"""
+
+
 import asyncio
 from typing import Any
 
@@ -162,6 +172,7 @@ class AsyncScraper:
 
 
 class DownloadLinksExtractor(AsyncScraper):
+    """Download links extractor class."""
 
     async def _process(self, entry: Any, collection: Any) -> None:
         """Individual asynchronous process.
@@ -203,6 +214,7 @@ class DownloadLinksExtractor(AsyncScraper):
 
 
 class DownloadDataExtractor(AsyncScraper):
+    """Download data extractor class."""
 
     async def _process(self, entry: Any, collection: Any) -> None:
         """Individual asynchronous process.

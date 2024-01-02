@@ -1,3 +1,10 @@
+"""Cache utilities module.
+
+Author:
+    Paulo Sanchez (@erlete)
+"""
+
+
 import os
 import pickle
 from typing import Any
