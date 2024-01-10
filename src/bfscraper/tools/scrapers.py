@@ -125,7 +125,7 @@ class AsyncScraper:
         Args:
             collection (Any): collection to be processed.
         """
-        async with self._session as session:
+        async with self._session as _:
             await tqdm_asyncio.gather(
                 *[self._process(item, collection) for item in collection],
                 disable=not self._progress_bar,
