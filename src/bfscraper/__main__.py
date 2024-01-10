@@ -15,7 +15,7 @@ from colorama import Fore, Style
 from hurry.filesize import size
 
 from .core.cache import Cache
-from .tools.aux import fprint, get_file_url, get_limit, parseFloat
+from .tools.helpers import fprint, get_file_url, get_limit, parseFloat
 from .tools.config import REGEX_FLAGS, TABLE_URL
 from .tools.scrapers import DownloadDataExtractor, DownloadLinksExtractor
 
