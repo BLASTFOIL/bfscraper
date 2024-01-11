@@ -38,6 +38,8 @@ class SiteScraper:
         self.limit = limit
         self.verbose = verbose
 
+        self.cache = Cache(".bfscrapercache")
+
     def timing(function):
         """Timing decorator.
 
@@ -138,27 +140,25 @@ class SiteScraper:
     @timing
     def _scrape_urls(self, data: dict):
         Logger.info(f"Scraping {len(data)} URLs...")
-        cache = Cache(".cache")
         DownloadLinksExtractor(
-            cache=cache,
+            cache=self.cache,
             timeout=self.timeout,
             limit=self.limit,
             progress_bar=self.verbose
         ).scrape(data)
-        cache.save()
+        self.cache.save()
         return data
 
     @timing
     def _download_airfoils(self, data: dict):
         Logger.info(f"Downloading {len(data)} airfoils...")
-        cache = Cache(".cache")
         DownloadDataExtractor(
-            cache=cache,
+            cache=self.cache,
             timeout=self.timeout,
             limit=self.limit,
             progress_bar=self.verbose
         ).scrape(data)
-        cache.save()
+        self.cache.save()
         return data
 
     @timing
