@@ -57,4 +57,12 @@ def cli(*args, **kwargs):
         *args: positional arguments.
         **kwargs: keyword arguments.
     """
+    # File format check:
+    if not kwargs["output"].endswith(".json"):
+        print(
+            f"Using default output file path as \"{kwargs['output']}\" is not "
+            + "a valid JSON file."
+        )
+        kwargs["output"] += DEFAULTS["output"]
+
     SiteScraper(**kwargs).run()
