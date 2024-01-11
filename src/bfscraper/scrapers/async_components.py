@@ -1,4 +1,4 @@
-"""Scraping utilities module.
+"""Asynchronous scraper components.
 
 This module contains all classes and methods that make asynchronous scraping
 possible.

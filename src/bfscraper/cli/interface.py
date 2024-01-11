@@ -1,3 +1,10 @@
+"""Command line interface for bfscraper.
+
+Author:
+    Paulo Sanchez (@erlete)
+"""
+
+
 import click
 
 from ..scrapers.site_scraper import SiteScraper
@@ -44,5 +51,10 @@ from .defaults import DEFAULTS
     help="Verbose mode."
 )
 def cli(*args, **kwargs):
-    """Command line interface."""
+    """Command line interface.
+
+    Args:
+        *args: positional arguments.
+        **kwargs: keyword arguments.
+    """
     SiteScraper(**kwargs).run()

@@ -1,3 +1,10 @@
+"""Compound scraper for the whole site.
+
+Author:
+    Paulo Sanchez (@erlete)
+"""
+
+
 import json
 import sys
 from functools import wraps
@@ -14,6 +21,16 @@ from .async_components import (AsyncScraper, DownloadDataExtractor,
 
 
 class SiteScraper:
+    """Site scraper class.
+
+    Attributes:
+        count (int): number of airfoils to scrape (-1 for all available).
+        output (str): output file path.
+        timeout (int): request timeout in seconds (-1 for no timeout).
+        limit (int): simultaneous requests limit.
+        verbose (bool): verbose mode.
+        cache (Cache): cache instance.
+    """
 
     def __init__(
         self,
@@ -90,12 +107,25 @@ class SiteScraper:
             return None
 
     @timing
-    def _fetch_entries(self):
+    def _fetch_entries(self) -> requests.Response:
+        """Fetch database entries.
+
+        Returns:
+            requests.Response: response object.
+        """
         Logger.info("Fetching database entries...")
         return requests.get(AsyncScraper.TABLE_URL)
 
     @timing
-    def _parse_entries(self, request: requests.Response):
+    def _parse_entries(self, request: requests.Response) -> dict:
+        """Parse database entries.
+
+        Args:
+            request (requests.Response): response object.
+
+        Returns:
+            dict: parsed data.
+        """
         Logger.info("Parsing database entries...")
         return {
             (
@@ -140,7 +170,15 @@ class SiteScraper:
         }
 
     @timing
-    def _scrape_urls(self, data: dict):
+    def _scrape_urls(self, data: dict) -> dict:
+        """Scrape download URLs.
+
+        Args:
+            data (dict): parsed data.
+
+        Returns:
+            dict: scraped data.
+        """
         Logger.info(f"Scraping {len(data)} URLs...")
         DownloadLinksExtractor(
             cache=self.cache,
@@ -152,7 +190,15 @@ class SiteScraper:
         return data
 
     @timing
-    def _download_airfoils(self, data: dict):
+    def _download_airfoils(self, data: dict) -> dict:
+        """Download all fetched and parsed airfoil data.
+
+        Args:
+            data (dict): scraped data.
+
+        Returns:
+            dict: downloaded data.
+        """
         Logger.info(f"Downloading {len(data)} airfoils...")
         DownloadDataExtractor(
             cache=self.cache,
@@ -164,12 +210,22 @@ class SiteScraper:
         return data
 
     @timing
-    def _save_data(self, data: dict):
+    def _save_data(self, data: dict) -> None:
+        """Save downloaded data.
+
+        Args:
+            data (dict): downloaded data.
+        """
         Logger.info("Saving data...")
         with open(self.output, "w") as f:
             json.dump(data, f, indent=4)
 
-    def _print_summary(self, data: dict):
+    def _print_summary(self, data: dict) -> None:
+        """Print scraping summary.
+
+        Args:
+            data (dict): downloaded data.
+        """
         total_bytes_1 = sum(
             sum(sys.getsizeof(value)
                 for value in entry['download-data'].values())
@@ -182,7 +238,7 @@ class SiteScraper:
             f" {size(total_bytes_1)} ({size(total_bytes_2)} including metadata)."
         )
 
-    def run(self):
+    def run(self) -> None:
         """Run the scraper."""
         Logger.info("Running scraper...")
         request = self._fetch_entries()
