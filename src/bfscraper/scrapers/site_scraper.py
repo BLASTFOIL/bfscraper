@@ -40,6 +40,8 @@ class SiteScraper:
 
         self.cache = Cache(".bfscrapercache")
 
+        Logger.ENABLED = self.verbose
+
     def timing(function):
         """Timing decorator.
 

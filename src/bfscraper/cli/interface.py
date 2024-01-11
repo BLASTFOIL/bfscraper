@@ -40,9 +40,8 @@ from .defaults import DEFAULTS
 @click.option(
     "--verbose",
     "-v",
-    default=DEFAULTS["verbose"],
-    show_default=True,
-    is_flag=True, help="Verbose mode."
+    is_flag=True,
+    help="Verbose mode."
 )
 def cli(*args, **kwargs):
     """Command line interface."""
