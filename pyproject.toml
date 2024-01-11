@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bfscraper"
-version = "0.1.0"
+version = "1.0.0"
 description = "BLASTFOIL scraper for database population"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -21,6 +21,8 @@ classifiers = [
 dependencies = [
     "aiohttp>=3.9.1",
     "asyncio>=3.4.3",
+    "click==8.1.7",
+    "colorama>=0.4.6",
     "hurry.filesize>=0.9",
     "regex>=2023.12.25",
     "requests>=2.31.0",
