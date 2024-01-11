@@ -17,7 +17,6 @@ from colorama import Fore, Style
 from tqdm.asyncio import tqdm_asyncio
 
 from ..core.cache import Cache
-from .config import BASE_URL, LIMIT, REGEX_FLAGS, TIMEOUT
 
 
 class AsyncScraper:
@@ -26,19 +25,31 @@ class AsyncScraper:
     Attributes:
         cache (Cache): cache instance.
         failed (dict[str, list[str]]): failed URLs.
+        timeout (int): timeout for each request.
+        limit (int): maximum number of concurrent requests.
         progress_bar (bool): whether to display a progress bar.
-        TIMEOUT (int): timeout for each request.
-        LIMIT (int): maximum number of concurrent requests.
+        REGEX_FLAGS (int): regex flags.
+        BASE_URL (str): base site URL.
+        TABLE_URL (str): data table URL.
     """
 
-    TIMEOUT: int = TIMEOUT
-    LIMIT: int = LIMIT
+    REGEX_FLAGS = re.IGNORECASE | re.DOTALL
+    BASE_URL = "https://bigfoil.com"
+    TABLE_URL = f"{BASE_URL}/bigtable1.json"
 
-    def __init__(self, cache: Cache, progress_bar: bool = True) -> None:
+    def __init__(
+        self,
+        cache: Cache,
+        timeout: int,
+        limit: int,
+        progress_bar: bool = True
+    ) -> None:
         """Initialize an AsyncScraper instance.
 
         Args:
             cache (Cache): cache instance.
+            timeout (int): timeout for each request.
+            limit (int): maximum number of concurrent requests.
             progress_bar (bool): whether to display a progress bar. Defaults
                 to True.
         """
@@ -46,8 +57,8 @@ class AsyncScraper:
         self.progress_bar = progress_bar
         self._failed: dict[str, list[str]] = {}
         self._session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=self.TIMEOUT),
-            connector=aiohttp.TCPConnector(limit=self.LIMIT)
+            timeout=aiohttp.ClientTimeout(total=timeout),
+            connector=aiohttp.TCPConnector(limit=limit)
         )
 
     @property
@@ -194,16 +205,16 @@ class DownloadLinksExtractor(AsyncScraper):
                 data = re.findall(
                     r"<\/div>(<b>.+?<br>)<br>",
                     (await response.read()).decode("utf-8").replace("\n", ""),
-                    flags=REGEX_FLAGS
+                    flags=AsyncScraper.REGEX_FLAGS
                 ).pop()
 
                 collection[entry]["download-links"].update({
                     match.group(1).lower().replace(" ", "-").strip(":"):
-                        f"{BASE_URL}{match.group(2)}"
+                        f"{AsyncScraper.BASE_URL}{match.group(2)}"
                     for match in re.finditer(
                         r"<b>(.+?)<\/b>.*?href=\"(.+?)\".*?<br>",
                         data,
-                        flags=REGEX_FLAGS
+                        flags=AsyncScraper.REGEX_FLAGS
                     )
                 })
 
