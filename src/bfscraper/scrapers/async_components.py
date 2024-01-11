@@ -144,11 +144,11 @@ class AsyncScraper:
                 colour="YELLOW",
                 bar_format=(
                     Style.BRIGHT + Fore.YELLOW
-                    + "> {percentage:3.0f}% |"
+                    + ":: {percentage:3.0f}% :: "
                     + Style.RESET_ALL
                     + "{bar}"
                     + Style.BRIGHT + Fore.YELLOW
-                    + "| <"
+                    + " (ETA: {remaining}) "
                 )
             )
 
