@@ -7,7 +7,7 @@ import regex as re
 import requests
 from hurry.filesize import size
 
-from ..core.cache import Cache
+from ..tools.cache import Cache
 from ..tools.logger import Logger
 from .async_components import (AsyncScraper, DownloadDataExtractor,
                                DownloadLinksExtractor)

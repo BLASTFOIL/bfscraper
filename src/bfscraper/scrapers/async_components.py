@@ -16,7 +16,7 @@ import regex as re
 from colorama import Fore, Style
 from tqdm.asyncio import tqdm_asyncio
 
-from ..core.cache import Cache
+from ..tools.cache import Cache
 
 
 class AsyncScraper:
