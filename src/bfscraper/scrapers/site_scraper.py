@@ -8,7 +8,6 @@ import requests
 from hurry.filesize import size
 
 from ..core.cache import Cache
-from ..tools.helpers import get_file_url, parseFloat
 from ..tools.logger import Logger
 from .async_components import (AsyncScraper, DownloadDataExtractor,
                                DownloadLinksExtractor)
@@ -59,6 +58,33 @@ class SiteScraper:
 
         return wrap
 
+    @staticmethod
+    def get_file_url(id_: str) -> str:
+        """Get file URL from airfoil ID.
+
+        Args:
+            id_ (str): airfoil ID.
+
+        Returns:
+            str: file URL.
+        """
+        return f"{AsyncScraper.BASE_URL}/D/{id_}_infoDAT.php"
+
+    @staticmethod
+    def parseFloat(string: str) -> float | None:
+        """Parse a string to a float.
+
+        Args:
+            string (str): string to parse.
+
+        Returns:
+            float | None: parsed float or None if the string is not a float.
+        """
+        try:
+            return float(string)
+        except Exception:
+            return None
+
     @timing
     def _fetch_entries(self):
         Logger.info("Fetching database entries...")
@@ -83,7 +109,7 @@ class SiteScraper:
                         entry["Link"],
                         flags=AsyncScraper.REGEX_FLAGS
                     )[0],
-                    "files": get_file_url(id_)
+                    "files": self.get_file_url(id_)
                 },
                 "download-links": {},
                 "download-data": {},
@@ -92,14 +118,14 @@ class SiteScraper:
                     entry["Data Sources"].split(" ")
                 ],
                 "optimizations": {
-                    "thickness": parseFloat(entry["Thickness"]),
-                    "x-thickness": parseFloat(entry["x Thickness"]),
-                    "camber": parseFloat(entry["Camber"]),
-                    "LD-Max": parseFloat(entry["LD Max"]),
-                    "Cl-Max": parseFloat(entry["Cl Max"]),
-                    "CdCl01": parseFloat(entry["CdCl01"]),
-                    "CdCl04": parseFloat(entry["CdCl04"]),
-                    "CdCl06": parseFloat(entry["CdCl06"])
+                    "thickness": self.parseFloat(entry["Thickness"]),
+                    "x-thickness": self.parseFloat(entry["x Thickness"]),
+                    "camber": self.parseFloat(entry["Camber"]),
+                    "LD-Max": self.parseFloat(entry["LD Max"]),
+                    "Cl-Max": self.parseFloat(entry["Cl Max"]),
+                    "CdCl01": self.parseFloat(entry["CdCl01"]),
+                    "CdCl04": self.parseFloat(entry["CdCl04"]),
+                    "CdCl06": self.parseFloat(entry["CdCl06"])
                 }
             }
             for entry in (
@@ -141,7 +167,6 @@ class SiteScraper:
         with open(self.output, "w") as f:
             json.dump(data, f, indent=4)
 
-    @timing
     def _print_summary(self, data: dict):
         total_bytes_1 = sum(
             sum(sys.getsizeof(value)
