@@ -164,7 +164,7 @@ class SiteScraper:
                 },
                 # Add containers for next step's download links and data:
                 "download-links": {},
-                "download-data": {},
+                "dat": {},
                 "data-sources": [
                     source.strip() for source in
                     entry["Data Sources"].split(" ")
@@ -247,8 +247,7 @@ class SiteScraper:
             data (dict): downloaded data.
         """
         data_bytes = sum(
-            sum(sys.getsizeof(value)
-                for value in entry['download-data'].values())
+            sys.getsizeof(entry["dat"])
             for entry in data.values()
         )
         metadata_bytes = sys.getsizeof(json.dumps(data, indent=4))
