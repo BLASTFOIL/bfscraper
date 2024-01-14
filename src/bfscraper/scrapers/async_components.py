@@ -192,7 +192,13 @@ class DownloadLinksExtractor(AsyncScraper):
             entry (Any): data entry.
             collection (Any): collection to be processed.
         """
-        url = collection[entry]["links"]["files"]
+        data_target = "files"
+
+        # Prevent errors in case the download links are not available:
+        if not collection[entry]["links"].get(data_target):
+            return
+
+        url = collection[entry]["links"][data_target]
 
         if self.cache.get(entry, {}).get("download-links"):
             collection[entry]["download-links"] = self.cache.get(
@@ -234,20 +240,24 @@ class DownloadDataExtractor(AsyncScraper):
             entry (Any): data entry.
             collection (Any): collection to be processed.
         """
-        for name, url in collection[entry]["download-links"].items():
-            if self.cache.get(entry, {}).get("download-data", {}).get(name):
-                collection[entry]["download-data"][name] = self.cache.get(
-                    entry
-                )["download-data"][name]
-                continue
+        data_target = "selig-format-dat-file"
 
-            try:
-                async with self.session.get(url=url) as response:
-                    collection[entry]["download-data"][name] = (
-                        await response.read()
-                    ).decode("utf-8")
+        # Prevent errors in case the dat file download link is not available:
+        if not collection[entry]["download-links"].get(data_target):
+            return
 
-                    self.cache.set(entry, collection[entry])
+        url = collection[entry]["download-links"][data_target]
+        if self.cache.get(entry, {}).get("dat"):
+            collection[entry]["dat"] = self.cache.get(entry)["dat"]
+            return
 
-            except Exception as exc:
-                self.failed.setdefault(exc.__class__.__name__, []).append(url)
+        try:
+            async with self.session.get(url=url) as response:
+                collection[entry]["dat"] = (
+                    await response.read()
+                ).decode("utf-8")
+
+                self.cache.set(entry, collection[entry])
+
+        except Exception as exc:
+            self.failed.setdefault(exc.__class__.__name__, []).append(url)

@@ -50,12 +50,12 @@ from .defaults import DEFAULTS
     is_flag=True,
     help="Verbose mode."
 )
-def cli(*args, **kwargs):
-    """Command line interface.
+def cli(**kwargs):
+    """BLASTFOIL scraper CLI
 
-    Args:
-        *args: positional arguments.
-        **kwargs: keyword arguments.
+    This is the command line interface for the BLASTFOIL scraper, a tool that
+    simplifies airfoil database population processes by providing with a
+    simple and easy to use interface.
     """
     # File format check:
     if not kwargs["output"].endswith(".json"):
