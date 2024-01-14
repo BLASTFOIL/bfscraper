@@ -47,6 +47,32 @@ Options:
   --help                       Show this message and exit.
 ```
 
+The output file will be a JSON file containing the following entry structure:
+
+```json
+{
+  <unique airfoil ID>: {
+      "name": <airfoil name>,
+      "family": <airfoil family>,
+      "links": {
+          "info": <URL of the information page>,
+          "files": <URL of the data download links page>
+      },
+      "download-links": {
+          <different format download URLs>
+      },
+      "dat": <extracted Selig Format airfoil contour>,
+      "data-sources": [
+          <supported data formats (XFoil, JavaFoil...)>
+      ],
+      "optimizations": {
+          <different optimized parameter values (Cl, Cd...)>
+      }
+  },
+  ...
+}
+```
+
 ## Sources
 
 This is the list of domains that are currently supported for scraping:
